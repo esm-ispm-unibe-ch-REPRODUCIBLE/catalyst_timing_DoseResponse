@@ -1,0 +1,784 @@
+---
+title: 'Appendix'
+author: "Konstantina Chalkou"
+output:
+  word_document:
+    toc: yes
+    toc_depth: '6'
+  html_document:
+    theme: cerulean
+    body_placement: left
+    toc: yes
+    toc_depth: 6
+    toc_collapsed: no
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 100% !important;
+  margin-left: 0%;
+  margin-right: 0%;
+  text-align: justify;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  $items = $('div#TOC li');
+  $items.each(function(idx) {
+    num_ul = $(this).parentsUntil('#TOC').length;
+    $(this).css({'text-indent': num_ul * 10, 'padding-left': 0});
+  });
+
+});
+</script>
+
+<style>
+  .superbigimage{
+      overflow: scroll !important;
+      white-space: nowrap;
+      max-width: 1600px;
+      max-height: 700px;
+  }
+
+  img{
+     max-width: 1000%;
+     max-height: 1000%;
+  }
+
+
+</style>
+
+
+```{css toc-content, echo = FALSE}
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+
+div.tocify {
+  width: 40%;
+  max-width: 450px;
+}
+```
+<div align="justify">
+```{r include= FALSE}
+###Libraries
+
+library(ggplot2)
+library(kableExtra)
+library(broom.mixed)
+library(knitr)
+library(tidyr)
+library(dplyr)
+library(R2jags)
+library(coda)
+library(writexl)
+library(scales)
+library(rms)
+library(Hmisc)
+library(patchwork)
+
+### Load data
+load("Saved_Data/Model1_Linear.RData") # Model 1 a 
+load("Saved_Data/Model2_rcs.RData") # Model 2 a 
+load("Saved_Data/Model1_isch30_Linear.RData") # Model 2 a 
+load("Saved_Data/Model2_isch_rcs.RData") # Model 2 a 
+load("Saved_Data/Model1_sich_Linear.RData") # Model 2 a 
+load("Saved_Data/Model2_sich_rcs.RData") # Model 2 a 
+load("Saved_Data/Model1_90_Linear.RData") # Model 2 a 
+load("Saved_Data/Model2_90_rcs.RData") # Model 3
+load("Saved_Data/Model3_Linear.RData")
+load("Saved_Data/Model3_90_Linear.RData")
+load("Saved_Data/Model3_RIS_Linear.RData")
+load("Saved_Data/Model3_SICH.RData")
+load("Saved_Data/Model4_SICH_RCS.RData")
+load("Saved_Data/Model4_RIC_RCS.RData")
+load("Saved_Data/Model4_90_RCS.RData")
+load("Saved_Data/Model4_RCS.RData")
+load("Saved_Data/Model3_RCS_MI.RData")
+load("Saved_Data/Model3_Linear_MI.RData")
+
+load("Saved_Data/Figures_Appendix.RData")
+load("Saved_Data/TimeDeviationvsNIHSS.RData")
+```
+## 3	Association between NIHSS score at baseline and discrepancies between the observed and intended timing of DOAC administration 
+
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE, fig.width=18, fig.height=12, fig.align='center', fig.cap = "<small>Appendix Figure 2. Scatterplot of time deviation of the intented time vs NIHSS at admission per study. </small>"}
+
+p
+
+```
+
+or 
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE, fig.width=18, fig.height=12, fig.align='center', fig.cap = "<small>Appendix Figure 2. Scatterplot of time deviation of the intented time vs NIHSS at admission per study. </small>"}
+
+p2
+
+```
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+
+knitr::kable(tbl, caption = "Appendix Table 1a: Multinomial logistic  regression: Odds of early or late randomization vs on-time according to NIHSS at admission.")
+
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+
+knitr::kable(tbl2, caption = "Appendix Table 1b: Linear regression for the association between the time deviation from the intented time and NIHSS at admission.")
+
+```
+
+## 4	Results from the four models for composite outcome at 30 days
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+
+#  Model 1
+result <- as.data.frame(Model1$BUGSoutput$summary)
+result_1<-result[c(1,9), c(3,5,7)]
+# starting from your object `result_1` with columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_1[, "50%"]
+lcl <- result_1[, "2.5%"]
+ucl <- result_1[, "97.5%"]
+
+result_1 <- data.frame(
+  `Model 1` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_1),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_1)
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_1) <- rn
+
+#  Model 2
+result <- as.data.frame(Model2_MVN$BUGSoutput$summary)
+result_2<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_2[, "50%"]
+lcl <- result_2[, "2.5%"]
+ucl <- result_2[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_2)
+pretty_names[pretty_names == "B[1]"]        <- "B\u2097"       # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "B\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_2 <- data.frame(
+  `Model 2` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+
+#  Model 3
+result <- as.data.frame(Model3_Linear$BUGSoutput$summary)
+result_3<-result[c(1,9), c(3,5,7)]
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_3[, "50%"]
+lcl <- result_3[, "2.5%"]
+ucl <- result_3[, "97.5%"]
+
+result_3 <- data.frame(
+  `Model 3` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_3),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_3)
+rn[rn == "B"]    <- "\u0394"  
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_3) <- rn
+
+#  Model 4
+result <- as.data.frame(Model4_RCS$BUGSoutput$summary)
+result_4<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_4[, "50%"]
+lcl <- result_4[, "2.5%"]
+ucl <- result_4[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_4)
+pretty_names[pretty_names == "B[1]"]        <- "\u0394\u2097"        # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "\u0394\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_4 <- data.frame(
+  `Model 4` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+# Desired row order (parameters)
+rows <- enc2utf8(c(
+  "B", "B\u2097", "B\u209B",          # B, Bₗ, Bₛ
+  "\u0394", "\u0394\u2097", "\u0394\u209B",  # Δ, Δₗ, Δₛ
+  "\u03C4\u00B2",                     # τ²
+  "s\u2081", "s\u2082",               # s₁, s₂
+  "\u03C1"                            # ρ
+))
+
+# Ensure row names are UTF-8
+fix_rn <- function(x) { rownames(x) <- enc2utf8(rownames(x)); x }
+
+result_1 <- fix_rn(result_1)
+result_2 <- fix_rn(result_2)
+result_3 <- fix_rn(result_3)
+result_4 <- fix_rn(result_4)
+
+models <- list("Model 1" = result_1,
+               "Model 2" = result_2,
+               "Model 3" = result_3,
+               "Model 4" = result_4)
+
+# Initialize blank table
+tab <- matrix("", nrow = length(rows), ncol = length(models),
+              dimnames = list(rows, names(models)))
+
+# Fill cells where a parameter exists in a model
+for (mn in names(models)) {
+  df <- models[[mn]]
+  rn <- rownames(df)
+  keep <- intersect(rn, rows)
+  tab[keep, mn] <- df[[1]][match(keep, rn)]  # use the single formatted column
+}
+
+combined <- as.data.frame(tab, stringsAsFactors = FALSE, check.names = FALSE)
+
+knitr::kable(combined, caption = "Appendix Table 2: Results from the four models for composite outcome at 30 days. Median (95% CrI).")
+
+```
+
+
+
+## 5	Results from multiple imputations for the composite outcome at 30 days
+
+
+
+```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=8, warning=FALSE, results='asis'}
+
+#  Model 1
+result <- as.data.frame(pooled_matrix_final)
+result_1<-as.data.frame(pooled_matrix_rcs_final)
+# starting from your object `result_1` with columns "2.5%", "50%", "97.5%"
+## ---- Rename, format, and combine ---------------------------------------
+
+# 1) Make safe copies
+res3 <- result
+res3<-res3[,-2]
+res4 <- result_1
+res4<-res4[,-2]
+
+## You already have:
+## res3 and res4 with columns: "Estimate", "2.5 %", "97.5 %"
+
+## 1) Rename rows (add superscript "pooled" to every symbol)
+rn3 <- rownames(res3)
+rn3[rn3 == "B (slope)"]                 <- "Δᵖᵒᵒˡᵉᵈ"
+rn3[rn3 == "tau2 (SD of study slopes)"] <- "τ²ᵖᵒᵒˡᵉᵈ"
+rownames(res3) <- rn3
+
+rn4 <- rownames(res4)
+rn4[rn4 == "B[1] (spline 1)"] <- "Δₗᵖᵒᵒˡᵉᵈ"
+rn4[rn4 == "B[2] (spline 2)"] <- "Δₛᵖᵒᵒˡᵉᵈ"
+rn4[rn4 == "rho"]             <- "ρᵖᵒᵒˡᵉᵈ"
+rownames(res4) <- rn4
+
+## 2) Desired order of rows
+param_order <- c("Δᵖᵒᵒˡᵉᵈ", "τ²ᵖᵒᵒˡᵉᵈ", "Δₗᵖᵒᵒˡᵉᵈ", "Δₛᵖᵒᵒˡᵉᵈ", "ρᵖᵒᵒˡᵉᵈ")
+
+## 3) Simple formatter (no SE)
+fmt <- function(df, key) {
+  if (!(key %in% rownames(df))) return("")
+  sprintf("%.6f [%.6f, %.6f]",
+          df[key, "Estimate"], df[key, "2.5 %"], df[key, "97.5 %"])
+}
+
+## 4) Build combined table
+combined_table <- data.frame(
+  Parameter = param_order,
+  `Model 3` = sapply(param_order, function(p) fmt(res3, p)),
+  `Model 4` = sapply(param_order, function(p) fmt(res4, p)),
+  check.names = FALSE,
+  row.names = NULL
+)
+
+## Optional: print nicely
+knitr::kable(
+  combined_table,
+  caption = "Appendix Table 3: Results from Rubin's rules for MI for Models 3 and 4, after imputing the missing observed DOAC administration time for composite at 30 days. Median (95% CrI)."
+)
+
+
+#combined_table2 <- as.data.frame(tab, stringsAsFactors = FALSE, check.names = FALSE)
+#knitr::kable(combined_table2, caption = "Appendix Table 1: Results from Rubin's rules for MI for Models 3 and 4, after imputing the missing observed DOAC administration time for composite at 30 days. Median (95% CrI).")
+
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE, fig.width=18, fig.height=12, fig.align='center', fig.cap = "<small>Appendix Figure 3. Results from Models 3 and 4, with and without Multiple Imputations (MI) for missing observed timing of DOAC administration for the primary composite outcome at 30 days. </small>"}
+
+combined_MI
+
+
+```
+
+## 6	Results from the four models for composite outcome at 90 days
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+
+#  Model 1
+result <- as.data.frame(Model1_90$BUGSoutput$summary)
+result_1<-result[c(1,9), c(3,5,7)]
+# starting from your object `result_1` with columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_1[, "50%"]
+lcl <- result_1[, "2.5%"]
+ucl <- result_1[, "97.5%"]
+
+result_1 <- data.frame(
+  `Model 1` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_1),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_1)
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_1) <- rn
+
+#  Model 2
+result <- as.data.frame(Model2_90_MVN$BUGSoutput$summary)
+result_2<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_2[, "50%"]
+lcl <- result_2[, "2.5%"]
+ucl <- result_2[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_2)
+pretty_names[pretty_names == "B[1]"]        <- "B\u2097"       # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "B\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_2 <- data.frame(
+  `Model 2` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+
+#  Model 3
+result <- as.data.frame(Model3_90_Linear$BUGSoutput$summary)
+result_3<-result[c(1,9), c(3,5,7)]
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_3[, "50%"]
+lcl <- result_3[, "2.5%"]
+ucl <- result_3[, "97.5%"]
+
+result_3 <- data.frame(
+  `Model 3` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_3),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_3)
+rn[rn == "B"]    <- "\u0394" 
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_3) <- rn
+
+#  Model 4
+result <- as.data.frame(Model4_90_RCS$BUGSoutput$summary)
+result_4<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_4[, "50%"]
+lcl <- result_4[, "2.5%"]
+ucl <- result_4[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_4)
+pretty_names[pretty_names == "B[1]"]        <- "\u0394\u2097"        # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "\u0394\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_4 <- data.frame(
+  `Model 4` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+# Desired row order (parameters)
+rows <- enc2utf8(c(
+  "B", "B\u2097", "B\u209B",          # B, Bₗ, Bₛ
+  "\u0394", "\u0394\u2097", "\u0394\u209B",  # Δ, Δₗ, Δₛ
+  "\u03C4\u00B2",                     # τ²
+  "s\u2081", "s\u2082",               # s₁, s₂
+  "\u03C1"                            # ρ
+))
+
+# Ensure row names are UTF-8
+fix_rn <- function(x) { rownames(x) <- enc2utf8(rownames(x)); x }
+
+result_1 <- fix_rn(result_1)
+result_2 <- fix_rn(result_2)
+result_3 <- fix_rn(result_3)
+result_4 <- fix_rn(result_4)
+
+models <- list("Model 1" = result_1,
+               "Model 2" = result_2,
+               "Model 3" = result_3,
+               "Model 4" = result_4)
+
+# Initialize blank table
+tab <- matrix("", nrow = length(rows), ncol = length(models),
+              dimnames = list(rows, names(models)))
+
+# Fill cells where a parameter exists in a model
+for (mn in names(models)) {
+  df <- models[[mn]]
+  rn <- rownames(df)
+  keep <- intersect(rn, rows)
+  tab[keep, mn] <- df[[1]][match(keep, rn)]  # use the single formatted column
+}
+
+combined <- as.data.frame(tab, stringsAsFactors = FALSE, check.names = FALSE)
+knitr::kable(combined, caption = "Appendix Table 4: Results from the four models for composite outcome at 90 days. Median (95% CrI).")
+
+```
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE, fig.width=18, fig.height=12, fig.align='center', fig.cap = "<small>Appendix Figure 4. Results from the four models for composite outcome at 90 days. </small>"}
+
+final_2x2_with_legend_90
+
+
+```
+
+
+## 7	Results from the four models for recurrent ischaemic stroke 
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+
+#  Model 1
+result <- as.data.frame(Model1_isch30$BUGSoutput$summary)
+result_1<-result[c(1,9), c(3,5,7)]
+# starting from your object `result_1` with columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_1[, "50%"]
+lcl <- result_1[, "2.5%"]
+ucl <- result_1[, "97.5%"]
+
+result_1 <- data.frame(
+  `Model 1` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_1),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_1)
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_1) <- rn
+
+#  Model 2
+result <- as.data.frame(Model2_isch_MVN$BUGSoutput$summary)
+result_2<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_2[, "50%"]
+lcl <- result_2[, "2.5%"]
+ucl <- result_2[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_2)
+pretty_names[pretty_names == "B[1]"]        <- "B\u2097"       # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "B\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_2 <- data.frame(
+  `Model 2` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+
+#  Model 3
+result <- as.data.frame(Model3_RIS_Linear$BUGSoutput$summary)
+result_3<-result[c(1,9), c(3,5,7)]
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_3[, "50%"]
+lcl <- result_3[, "2.5%"]
+ucl <- result_3[, "97.5%"]
+
+result_3 <- data.frame(
+  `Model 3` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_3),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_3)
+rn[rn == "B"]    <- "\u0394" 
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_3) <- rn
+
+#  Model 4
+result <- as.data.frame(Model4_RIS_RCS$BUGSoutput$summary)
+result_4<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_4[, "50%"]
+lcl <- result_4[, "2.5%"]
+ucl <- result_4[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_4)
+pretty_names[pretty_names == "B[1]"]        <- "\u0394\u2097"        # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "\u0394\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_4 <- data.frame(
+  `Model 4` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+# Desired row order (parameters)
+rows <- enc2utf8(c(
+  "B", "B\u2097", "B\u209B",          # B, Bₗ, Bₛ
+  "\u0394", "\u0394\u2097", "\u0394\u209B",  # Δ, Δₗ, Δₛ
+  "\u03C4\u00B2",                     # τ²
+  "s\u2081", "s\u2082",               # s₁, s₂
+  "\u03C1"                            # ρ
+))
+
+# Ensure row names are UTF-8
+fix_rn <- function(x) { rownames(x) <- enc2utf8(rownames(x)); x }
+
+result_1 <- fix_rn(result_1)
+result_2 <- fix_rn(result_2)
+result_3 <- fix_rn(result_3)
+result_4 <- fix_rn(result_4)
+
+models <- list("Model 1" = result_1,
+               "Model 2" = result_2,
+               "Model 3" = result_3,
+               "Model 4" = result_4)
+
+# Initialize blank table
+tab <- matrix("", nrow = length(rows), ncol = length(models),
+              dimnames = list(rows, names(models)))
+
+# Fill cells where a parameter exists in a model
+for (mn in names(models)) {
+  df <- models[[mn]]
+  rn <- rownames(df)
+  keep <- intersect(rn, rows)
+  tab[keep, mn] <- df[[1]][match(keep, rn)]  # use the single formatted column
+}
+
+combined <- as.data.frame(tab, stringsAsFactors = FALSE, check.names = FALSE)
+knitr::kable(combined, caption = "Appendix Table 5: Results from the four models for recurrent ischaemic stroke at 30 days. Median (95% CrI).")
+
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE, fig.width=18, fig.height=12, fig.align='center', fig.cap = "<small>Appendix Figure 5. Results from the four models for recurrent ischemic stroke at 30 days. </small>"}
+
+final_2x2_with_legend_RIS
+
+
+```
+
+## 8	Results from the four models for symptomatic intracerebral haemorrhage
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+
+#  Model 1
+result <- as.data.frame(Model1_sich$BUGSoutput$summary)
+result_1<-result[c(1,9), c(3,5,7)]
+# starting from your object `result_1` with columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_1[, "50%"]
+lcl <- result_1[, "2.5%"]
+ucl <- result_1[, "97.5%"]
+
+result_1 <- data.frame(
+  `Model 1` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_1),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_1)
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_1) <- rn
+
+#  Model 2
+result <- as.data.frame(Model2_sich_MVN$BUGSoutput$summary)
+result_2<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_2[, "50%"]
+lcl <- result_2[, "2.5%"]
+ucl <- result_2[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_2)
+pretty_names[pretty_names == "B[1]"]        <- "B\u2097"       # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "B\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_2 <- data.frame(
+  `Model 2` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+
+#  Model 3
+result <- as.data.frame(Model3_SICH$BUGSoutput$summary)
+result_3<-result[c(1,9), c(3,5,7)]
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_3[, "50%"]
+lcl <- result_3[, "2.5%"]
+ucl <- result_3[, "97.5%"]
+
+result_3 <- data.frame(
+  `Model 3` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = rownames(result_3),
+  check.names = FALSE
+)
+
+# nicer row names: B and τ²
+rn <- rownames(result_3)
+rn[rn == "B"]    <- "\u0394" 
+rn[rn == "tau2"] <- "\u03C4\u00B2"    # \u03C4\u00B2
+rownames(result_3) <- rn
+
+#  Model 4
+result <- as.data.frame(Model4_SICH_RCS$BUGSoutput$summary)
+result_4<-result[c(1,2,19, 22,23), c(3,5,7)]
+# Assuming `result_2` has columns "2.5%", "50%", "97.5%"
+
+fmt <- function(x) formatC(x, format = "f", digits = 3)
+
+med <- result_4[, "50%"]
+lcl <- result_4[, "2.5%"]
+ucl <- result_4[, "97.5%"]
+
+# Pretty row names
+pretty_names <- rownames(result_4)
+pretty_names[pretty_names == "B[1]"]        <- "\u0394\u2097"        # Bₗ
+pretty_names[pretty_names == "B[2]"]        <- "\u0394\u209B"       # Bₛ
+pretty_names[pretty_names == "Sigma[1,1]"]  <- "s\u2081"       # s₁  (use "s\u2081\u00B2" for s₁²)
+pretty_names[pretty_names == "Sigma[2,2]"]  <- "s\u2082"       # s₂  (use "s\u2082\u00B2" for s₂²)
+pretty_names[pretty_names == "rho"]         <- "\u03C1"        # ρ
+
+result_4 <- data.frame(
+  `Model 4` = sprintf("%s (%s, %s)", fmt(med), fmt(lcl), fmt(ucl)),
+  row.names = pretty_names,
+  check.names = FALSE
+)
+
+# Desired row order (parameters)
+rows <- enc2utf8(c(
+  "B", "B\u2097", "B\u209B",          # B, Bₗ, Bₛ
+  "\u0394", "\u0394\u2097", "\u0394\u209B",  # Δ, Δₗ, Δₛ
+  "\u03C4\u00B2",                     # τ²
+  "s\u2081", "s\u2082",               # s₁, s₂
+  "\u03C1"                            # ρ
+))
+
+# Ensure row names are UTF-8
+fix_rn <- function(x) { rownames(x) <- enc2utf8(rownames(x)); x }
+
+result_1 <- fix_rn(result_1)
+result_2 <- fix_rn(result_2)
+result_3 <- fix_rn(result_3)
+result_4 <- fix_rn(result_4)
+
+models <- list("Model 1" = result_1,
+               "Model 2" = result_2,
+               "Model 3" = result_3,
+               "Model 4" = result_4)
+
+# Initialize blank table
+tab <- matrix("", nrow = length(rows), ncol = length(models),
+              dimnames = list(rows, names(models)))
+
+# Fill cells where a parameter exists in a model
+for (mn in names(models)) {
+  df <- models[[mn]]
+  rn <- rownames(df)
+  keep <- intersect(rn, rows)
+  tab[keep, mn] <- df[[1]][match(keep, rn)]  # use the single formatted column
+}
+
+combined <- as.data.frame(tab, stringsAsFactors = FALSE, check.names = FALSE)
+knitr::kable(combined, caption = "Appendix Table 6: Results from the four models for symptomatic intracerebral haemorrhage at 30 days. Median (95% CrI).")
+
+```
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE, fig.width=18, fig.height=18, fig.align='center', fig.cap = "<small>Appendix Figure 6. Results from the four models for recurrent ischemic stroke at 30 days. </small>"}
+
+final_2x2_with_legend_SICH
+
+
+```
